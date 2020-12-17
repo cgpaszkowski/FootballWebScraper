@@ -53,7 +53,7 @@ public class App
     
     public static void liverpool() {
     	try {
-        	String website_url = "https://www.liverpoolfc.com/match/2019-20/first-team/fixtures-and-results/?language=Java";
+        	String website_url = "https://www.liverpoolfc.com/match/2020-21/first-team/fixtures-and-results/?language=Java";
         	
         	Document doc = Jsoup.connect(website_url).get();
         	System.out.printf("Title: %s\n", doc.title());
@@ -125,32 +125,26 @@ public class App
     
     public static void legia() {
     	try {
-    		String website_url = "https://legia.com/pilka-nozna/terminarz/nadchodzace-mecze";
+    		String website_url = "https://legionisci.com/terminarz_legii";
     		Document doc = Jsoup.connect(website_url).get();
         	System.out.printf("Title: Legia Warszawa Schedule\n");
         	
         	// Get the list of all fixtures
-        	Element fixtures_list = doc.getElementsByClass("CDp").first();
+        	Element fixtures_list = doc.getElementsByClass("terminarz").first();
         	Elements listItems = fixtures_list.children();        	
         	
             for (Element el : listItems) {
             	
-            	// Extract fixture month and year
-                String fixtureMonth = el.getElementsByClass("F9av").text();
+            	// Extract fixture opponent
+            	String teamName = el.select("a").first().text();
             	
-                // Extract fixture time and date
-                String fixtureDate = el.getElementsByClass("BPjp").text();
+            	// Extract fixture time and date
+                String fixtureDate = el.getElementsByTag("time").text();
                 
-                // Extract fixture opponent
-                String teamName = el.getElementsByClass("BPcb BPjt").text();
                 
-                if (el.getElementsByClass("CDad").isEmpty()) {
-                	System.out.println(fixtureDate + " - " + teamName);
-                }
+                System.out.println("Test 2");
+               	System.out.println(fixtureDate + " - " + teamName);
                 
-                else {
-                	System.out.println("\n" + fixtureMonth + "\n");
-                }
                 
             }
     	}
