@@ -38,7 +38,7 @@ public class App
         		toronto();
         		break;
         	case 3:
-        		legia();
+        		//legia();
         		break;
         	case 4:
         		halifax();
@@ -52,34 +52,35 @@ public class App
     
     
     public static void liverpool() {
+    	final String website_url_lfc = "https://www.liverpoolfc.com/match/2020-21/first-team/fixtures-and-results/?language=Java";
+    	
     	try {
-        	String website_url = "https://www.liverpoolfc.com/match/2020-21/first-team/fixtures-and-results/?language=Java";
-        	
-        	Document doc = Jsoup.connect(website_url).get();
-        	System.out.printf("Title: %s\n", doc.title());
+        	Document doc = Jsoup.connect(website_url_lfc).get();
+        	System.out.printf("Title: Liverpool FC Schedule");
         	
         	// Get the list of all fixtures
-        	Element fixtures_list = doc.getElementsByClass("fixture-list-main").first();
-        	Elements listItems = fixtures_list.children();        	
-        	
-            for (Element el : listItems) {
+        	for (Element row : doc.select("ul.fixture-list-main li")) {
             	
+        		if(!row.select("h2").text().equals("")) {
+        			System.out.println("\n" + row.select("h2").text());
+        			continue;
+        		}
+        		
+        		if(row.select("div.date").text().equals("")) {
+        			System.out.println("Empty Row");
+        			continue;
+        		}
+        		
             	// Extract fixture month and year
-                String fixtureMonth = el.getElementsByClass("fixtures-list-title").text();
-            	
-                // Extract fixture time and date
-                String fixtureDate = el.getElementsByClass("date").text();
+                String fixtureDate = row.select("div.date").text();
                 
                 // Extract fixture opponent
-                String teamName = el.getElementsByClass("name").text();
+                String teamName = row.select("div.name").text();
                 
-                if (el.getElementsByClass("fixtures-list-title").isEmpty()) {
-                	System.out.println(fixtureDate + " - " + teamName);
-                }
-                
-                else {
-                	System.out.println("\n" + fixtureMonth + "\n");
-                }
+                // Home or Away
+                String location = row.select("div.name span").text();
+
+                System.out.println(fixtureDate + "(GMT) - " + teamName);
                 
             }
         }
@@ -90,28 +91,27 @@ public class App
     }
     
     public static void toronto() {
+    	final String website_url_tfc = "https://www.torontofc.ca/schedule?month=all&year=2020&club_options=Filters&op=Update&form_build_id=form-4PDWg6ivzEXb6R0uJ0yeuGEn0vkHZhe5lDbOwT5RTbk&form_id=mp7_schedule_hub_search_filters_form";
+    	
     	try {
-    		String website_url = "https://www.torontofc.ca/schedule?month=all&year=2020&club_options=Filters&op=Update&form_build_id=form-4PDWg6ivzEXb6R0uJ0yeuGEn0vkHZhe5lDbOwT5RTbk&form_id=mp7_schedule_hub_search_filters_form";
-    		Document doc = Jsoup.connect(website_url).followRedirects(false).get();
+    		Document doc = Jsoup.connect(website_url_tfc).followRedirects(false).get();
         	System.out.println("Title: Toronto FC Schedule\n");
         	
-        	// Get the list of all fixtures
-        	Element fixtures_list = doc.getElementsByClass("schedule_list").first();
-        	Elements listItems = fixtures_list.children();        	
+        	// Get the list of all fixtures        	
         	
-            for (Element el : listItems) {
+            for (Element row : doc.select("ul.schedule_list.list-reset li")) {
             	
             	// Home or Away
-            	String location = el.getElementsByClass("match_home_away").text();
+            	String location = row.select("span.match_home_away").text();
             	
             	// Extract fixture opponent
-                String teamName = el.getElementsByClass("club_logo").attr("title");
+                String teamName = row.select("div.match_matchup").text();
             	
                 // Extract fixture time and date
-            	String fixtureDate = el.getElementsByClass("match_date").text();
+            	String fixtureDate = row.select("div.match_date").text();
                 
             	if (!fixtureDate.isEmpty()) {
-            		System.out.println(fixtureDate + " - " + teamName + " (" + location + ")");
+            		System.out.println(fixtureDate + " - \n\t" + teamName + " (" + location + ")");
             	}
             	
             }
@@ -123,6 +123,7 @@ public class App
     	
     }
     
+/*    
     public static void legia() {
     	try {
     		String website_url = "https://legionisci.com/terminarz_legii";
@@ -135,6 +136,13 @@ public class App
         	
             for (Element el : listItems) {
             	
+            	if(el.get) {
+            		
+            	}
+            	
+            	else {
+            		
+            	}
             	// Extract fixture opponent
             	String teamName = el.select("a").first().text();
             	
@@ -152,32 +160,47 @@ public class App
     		e.printStackTrace();
     	}
     }
-    
+  */  
     public static void halifax() {
     	
+    	final String website_url_hfx = "https://canpl.ca/schedule/2019ALL/HFX";
+    	
     	try{
-    		String website_url = "https://canpl.ca/schedule/2020/HFX";
-    		Document doc = Jsoup.connect(website_url).get();
-        	System.out.printf("Title: Halifax Wanderers Schedule");
+    		Document doc = Jsoup.connect(website_url_hfx).get();
+        	System.out.println("Title: Halifax Wanderers Schedule");
+
+        	//won't work because data is loaded dynamically ....
+        	System.out.println("Doesn't work because the data loads dynamically");
         	
         	// Get the list of all fixtures
-        	Element fixtures_list = doc.getElementsByClass("stats-data-table").first();
-        	Elements listItems = fixtures_list.children();
-        	
-            for (Element el : listItems) {
+            for (Element row : doc.select("table.stats-data-table.table tr")) {
             	
-            	// Home or Away
-            	String location = el.getElementsByClass("match_home_away").text();
+            	if(row.select("td.table__td.table__td--schedule-date > div.schedule-date_top > span").text().equals("")) {
+            		continue;
+            	}
             	
-            	// Extract fixture opponent
-                String teamName = el.getElementsByClass("club_logo").attr("title");
+            	String fixtureDate = row.select("td.table__td.table__td--schedule-date > div.schedule-date_top > span").text();
+            	String teamName;
+            	String teamNameH = row.select("td.table__td.table__td--schedule-full-home").text();
+            	String location;
             	
-                // Extract fixture time and date
-            	String fixtureDate = el.getElementsByClass("match_date").text();
-                
+            	if(teamNameH.equals("HFX Wanderers")) {
+            		//get away team
+            		teamName = row.select("td.table__td.table__td--schedule-full-away").text();
+            		//set location home
+            		location = "Home";
+            	}
+            	else {
+            		//get home team
+            		teamName = teamNameH;
+            		//set location away
+            		location = "Away";
+            	}
+            	
             	if (!fixtureDate.isEmpty()) {
             		System.out.println(fixtureDate + " - " + teamName + " (" + location + ")");
             	}
+            	
             	
             }
         	
